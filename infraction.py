@@ -14,10 +14,20 @@ class Infraction:
         self.__description = description
         self.__fine_price = fine_price
 
+    @property
+    def description(self) -> str:
+        return self.__description
+
+    @property
+    def fine_price(self) -> float:
+        return self.__fine_price
+
+    def __str__(self):
+        return f"Infraction: {self.__description} Fine: ${self.__fine_price}"
+
     def is_valid(self) -> bool:  # checks if infraction objects are valid
-        if self.__description == "":
-            if self.__fine_price > 0:
-                return True
+        if self.__description == "" and self.__fine_price > 0:
+            return True
         return False
 
     def save(self):
@@ -50,7 +60,7 @@ class Infraction:
         return True if infraction else False
 
     @classmethod
-    def display_existing_infraction(cls) -> list:
+    def display_existing_infraction(cls) :
         query = """
             SELECT *
             FROM infraction
@@ -64,9 +74,9 @@ class Infraction:
             while rows:
                 print(rows[0], rows[1], rows[2])
                 rows = cursor.fetchone()
-            cursor.close()
         else:
             print("No infractions found")
+        cursor.close()
 
     # searches an infraction using the id or description returns data
     @classmethod
@@ -105,6 +115,7 @@ class Infraction:
             WHERE id = %s;
             """
             cursor.execute(query, (infraction_id,))
+            connection.commit()  # don't forget to commit
             cursor.close()
             cls.display_existing_infraction()
 
@@ -175,4 +186,5 @@ class Infraction:
 
 
 that_infraction = Infraction("Driving with no lights on", 8000)
+that_infraction.save()
 Infraction.update_infraction()
